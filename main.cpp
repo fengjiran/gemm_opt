@@ -7,6 +7,11 @@
 #include "matmul_1x4_4.h"
 #include "matmul_1x4_5.h"
 #include "matmul_1x4_6.h"
+#include "matmul_1x4_7.h"
+#include "matmul_1x4_8.h"
+#include "matmul_1x4_9.h"
+#include "matmul_4x4_3.h"
+#include "matmul_4x4_4.h"
 
 void random_matrix(int m, int n, float *a, int lda) {
     //double drand48();
@@ -84,7 +89,12 @@ int main() {
 //            my_matmul_1x4_3(m, n, k, a, lda, b, ldb, c, ldc);
 //            my_matmul_1x4_4(m, n, k, a, lda, b, ldb, c, ldc);
 //            my_matmul_1x4_5(m, n, k, a, lda, b, ldb, c, ldc);
-            my_matmul_1x4_6(m, n, k, a, lda, b, ldb, c, ldc);
+//            my_matmul_1x4_6(m, n, k, a, lda, b, ldb, c, ldc);
+//            my_matmul_1x4_7(m, n, k, a, lda, b, ldb, c, ldc);
+//            my_matmul_1x4_8(m, n, k, a, lda, b, ldb, c, ldc);
+//            my_matmul_1x4_9(m, n, k, a, lda, b, ldb, c, ldc);
+//            my_matmul_4x4_3(m, n, k, a, lda, b, ldb, c, ldc);
+            my_matmul_4x4_4(m, n, k, a, lda, b, ldb, c, ldc);
             clock_gettime(CLOCK_MONOTONIC_RAW, &end);
             time_tmp = get_time(&start, &end);
 

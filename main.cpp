@@ -1,57 +1,7 @@
-#include <iostream>
 #include <cstring>
 #include <cstdlib>
 #include "dclock.h"
-#include "matmul_origin.h"
-//#include "matmul_1x4_3.h"
-//#include "matmul_1x4_4.h"
-//#include "matmul_1x4_5.h"
-//#include "matmul_1x4_6.h"
-//#include "matmul_1x4_7.h"
-//#include "matmul_1x4_8.h"
-//#include "matmul_1x4_9.h"
-//#include "matmul_4x4_3.h"
-//#include "matmul_4x4_4.h"
-//#include "matmul_4x4_5.h"
-//#include "matmul_4x4_6.h"
-//#include "matmul_4x4_7.h"
-//#include "matmul_4x4_10.h"
-#include "matmul_4x4_11.h"
-
-void random_matrix(int m, int n, float *a, int lda) {
-    //double drand48();
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            A(i, j) = (float) drand48();
-        }
-    }
-}
-
-void copy_matrix(int m, int n, const float *a, int lda, float *b, int ldb) {
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            B(i, j) = A(i, j);
-        }
-    }
-}
-
-float compare_matrices(int m, int n, float *a, int lda, float *b, int ldb) {
-    float max_diff = 0.0, diff;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            diff = std::abs(A(i, j) - B(i, j));
-            max_diff = std::max(diff, max_diff);
-            if (max_diff > 0.5f || max_diff < -0.5f) {
-                printf("\n error: i %d  j %d diff %f", i, j, max_diff);
-            }
-        }
-    }
-    return max_diff;
-}
-
-static double get_time(struct timespec *start, struct timespec *end) {
-    return end->tv_sec - start->tv_sec + (end->tv_nsec - start->tv_nsec) * 1e-9;
-}
+#include "matmul.h"
 
 int main() {
     int m, n, k;

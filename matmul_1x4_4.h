@@ -10,8 +10,34 @@
 #define C(i, j) c[ (i) * ldc + (j) ]
 
 // In this version, we "inline" AddDot
-void AddDot1x4(int k, float *a, int lda, float *b, int ldb, float *c, int ldc) {
-    //
+void AddDot1x4_4(int k, const float *a, int lda, const float *b, int ldb, float *c, int ldc) {
+    // AddDot(k, &A(0, 0), lda, &B(0, 0), &C(0, 0));
+    for (int p = 0; p < k; p++) {
+        C(0, 0) += A(0, p) * B(p, 0);
+    }
+
+    // AddDot(k, &A(0, 0), lda, &B(0, 1), &C(0, 1));
+    for (int p = 0; p < k; p++) {
+        C(0, 1) += A(0, p) * B(p, 1);
+    }
+
+    // AddDot(k, &A(0, 0), lda, &B(0, 2), &C(0, 2));
+    for (int p = 0; p < k; p++) {
+        C(0, 2) += A(0, p) * B(p, 2);
+    }
+
+    // AddDot(k, &A(0, 0), lda, &B(0, 3), &C(0, 3));
+    for (int p = 0; p < k; p++) {
+        C(0, 3) += A(0, p) * B(p, 3);
+    }
+}
+
+void my_matmul_1x4_4(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i++) {
+            AddDot1x4_4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc);
+        }
+    }
 }
 
 #endif //GEMM_OPT_MATMUL_1X4_4_H

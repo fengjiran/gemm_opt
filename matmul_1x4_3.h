@@ -20,7 +20,7 @@ void AddDot(int k, const float *x, int incx, const float *y, float *gamma) {
     }
 }
 
-void AddDot1x4(int k, float *a, int lda, float *b, int ldb, float *c, int ldc) {
+void AddDot1x4_3(int k, const float *a, int lda, const float *b, int ldb, float *c, int ldc) {
     AddDot(k, &A(0, 0), lda, &B(0, 0), &C(0, 0));
     AddDot(k, &A(0, 0), lda, &B(0, 1), &C(0, 1));
     AddDot(k, &A(0, 0), lda, &B(0, 2), &C(0, 2));
@@ -30,7 +30,7 @@ void AddDot1x4(int k, float *a, int lda, float *b, int ldb, float *c, int ldc) {
 void my_matmul_1x4_3(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc) {
     for (int j = 0; j < n; j += 4) {
         for (int i = 0; i < m; i++) {
-            AddDot1x4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc);
+            AddDot1x4_3(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc);
         }
     }
 }

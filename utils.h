@@ -12,9 +12,9 @@
 #include <pmmintrin.h>  // SSE2
 #include <emmintrin.h>  // SSE3
 
-#define A(i, j) a[ (i) * lda + (j) ]
-#define B(i, j) b[ (i) * ldb + (j) ]
-#define C(i, j) c[ (i) * ldc + (j) ]
+#define A(i, j) a[(i) * lda + (j)]
+#define B(i, j) b[(i) * ldb + (j)]
+#define C(i, j) c[(i) * ldc + (j)]
 
 // Create macro to let Y(i) equal the ith element of x
 #define Y(i) y[(i) * incx]

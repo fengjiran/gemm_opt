@@ -1,6 +1,6 @@
 #include <cstring>
 #include <cstdlib>
-#include "dclock.h"
+//#include "dclock.h"
 #include "matmul.h"
 
 int main() {
@@ -9,28 +9,28 @@ int main() {
     double time_tmp, time_best, gflops, diff;
     float *a, *b, *c, *prec, *nowc;
     struct timespec start, end;
-    double time_used = 0.0;
+//    double time_used = 0.0;
 
     for (int i = 40; i <= 1000; i += 40) {
         m = i;
         k = i;
         n = i;
-        lda = m;
-        ldb = k;
-        ldc = m;
+        lda = k;
+        ldb = n;
+        ldc = n;
         gflops = 2.0 * m * n * k * 1.0e-9;
-        a = new float[lda * k];
-        b = new float[ldb * n];
-        c = new float[ldc * n];
-        prec = new float[ldc * n];
-        nowc = new float[ldc * n];
+        a = new float[lda * m];
+        b = new float[ldb * k];
+        c = new float[ldc * m];
+        prec = new float[ldc * m];
+        nowc = new float[ldc * m];
 
         // 随机填充矩阵
         random_matrix(m, k, a, lda);
         random_matrix(k, n, b, ldb);
         random_matrix(m, n, prec, ldc);
 
-        memset(prec, 0, ldc * n * sizeof(float));
+        memset(prec, 0, ldc * m * sizeof(float));
 
         copy_matrix(m, n, prec, ldc, nowc, ldc);
 

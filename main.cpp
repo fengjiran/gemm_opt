@@ -51,7 +51,7 @@ int main() {
 //            my_matmul_4x4_3(m, n, k, a, lda, b, ldb, c, ldc);
 //            my_matmul_4x4_4(m, n, k, a, lda, b, ldb, c, ldc);
 //            my_matmul_4x4_5(m, n, k, a, lda, b, ldb, c, ldc);
-            my_matmul_4x4_11(m, n, k, a, lda, b, ldb, c, ldc);
+            my_matmul_4x4_13(m, n, k, a, lda, b, ldb, c, ldc);
             clock_gettime(CLOCK_MONOTONIC_RAW, &end);
             time_tmp = get_time(&start, &end);
 

@@ -756,3 +756,104 @@ void my_matmul_4x4_11(int m, int n, int k, float *a, int lda, float *b, int ldb,
         }
     }
 }
+
+void PackMatrixA(int k, float *a, int lda, float *a_to) {
+    float *a_0p_ptr = a;
+    float *a_1p_ptr = a + lda;
+    float *a_2p_ptr = a + (lda << 1);
+    float *a_3p_ptr = a + lda * 3;
+    for (int p = 0; p < k; p++) {
+        *a_to++ = *a_0p_ptr++;
+        *a_to++ = *a_1p_ptr++;
+        *a_to++ = *a_2p_ptr++;
+        *a_to++ = *a_3p_ptr++;
+    }
+}
+
+void PackMatrixB(int k, float *b, int ldb, float *b_to) {
+    for (int p = 0; p < k; p++) {
+        float *b_ij_ptr = &B(p, 0);
+        *b_to++ = *b_ij_ptr++;
+        *b_to++ = *b_ij_ptr++;
+        *b_to++ = *b_ij_ptr++;
+        *b_to++ = *b_ij_ptr++;
+    }
+}
+
+void AddDot4x4_13(int k, const float *a, int lda, const float *b, int ldb, float *c, int ldc) {
+    v2df_t c_p0_sum, c_p1_sum, c_p2_sum, c_p3_sum;
+    v2df_t a_0p_reg, a_1p_reg, a_2p_reg, a_3p_reg;
+    v2df_t b_reg;
+
+    c_p0_sum.v = _mm_setzero_ps();
+    c_p1_sum.v = _mm_setzero_ps();
+    c_p2_sum.v = _mm_setzero_ps();
+    c_p3_sum.v = _mm_setzero_ps();
+
+    a_0p_reg.v = _mm_setzero_ps();
+    a_1p_reg.v = _mm_setzero_ps();
+    a_2p_reg.v = _mm_setzero_ps();
+    a_3p_reg.v = _mm_setzero_ps();
+
+    for (int p = 0; p < k; p++) {
+        b_reg.v = _mm_load_ps(b);
+        b += 4;
+
+        a_0p_reg.v = _mm_set_ps1(a[0]);
+        a_1p_reg.v = _mm_set_ps1(a[1]);
+        a_2p_reg.v = _mm_set_ps1(a[2]);
+        a_3p_reg.v = _mm_set_ps1(a[3]);
+
+        a += 4;
+
+        c_p0_sum.v += b_reg.v * a_0p_reg.v;
+        c_p1_sum.v += b_reg.v * a_1p_reg.v;
+        c_p2_sum.v += b_reg.v * a_2p_reg.v;
+        c_p3_sum.v += b_reg.v * a_3p_reg.v;
+    }
+
+    C(0, 0) += c_p0_sum.d[0];
+    C(0, 1) += c_p0_sum.d[1];
+    C(0, 2) += c_p0_sum.d[2];
+    C(0, 3) += c_p0_sum.d[3];
+
+    C(1, 0) += c_p1_sum.d[0];
+    C(1, 1) += c_p1_sum.d[1];
+    C(1, 2) += c_p1_sum.d[2];
+    C(1, 3) += c_p1_sum.d[3];
+
+    C(2, 0) += c_p2_sum.d[0];
+    C(2, 1) += c_p2_sum.d[1];
+    C(2, 2) += c_p2_sum.d[2];
+    C(2, 3) += c_p2_sum.d[3];
+
+    C(3, 0) += c_p3_sum.d[0];
+    C(3, 1) += c_p3_sum.d[1];
+    C(3, 2) += c_p3_sum.d[2];
+    C(3, 3) += c_p3_sum.d[3];
+}
+
+void InnerKernel_13(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc) {
+    float packedA[m * k];
+    float packedB[k * n];
+    for (int j = 0; j < n; j += 4) {
+        PackMatrixB(k, &B(0, j), ldb, packedB + j * k);
+        for (int i = 0; i < m; i += 4) {
+            if (j == 0) {
+                PackMatrixA(k, &A(i, 0), lda, packedA + i * k);
+            }
+            AddDot4x4_13(k, packedA + i * k, k, packedB + j * k, 4, &C(i, j), ldc);
+        }
+    }
+}
+
+void my_matmul_4x4_13(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc) {
+    int pb, ib;
+    for (int p = 0; p < k; p += KC) {
+        pb = min(k - p, KC);
+        for (int i = 0; i < m; i += MC) {
+            ib = min(m - i, MC);
+            InnerKernel_13(ib, n, pb, &A(i, p), lda, &B(p, 0), ldb, &C(i, 0), ldc);
+        }
+    }
+}

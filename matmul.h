@@ -47,4 +47,6 @@ void my_matmul_4x4_10(int m, int n, int k, float *a, int lda, float *b, int ldb,
 
 void my_matmul_4x4_11(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
 
+void my_matmul_4x4_13(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+
 #endif //GEMM_OPT_MATMUL_H

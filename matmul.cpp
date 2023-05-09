@@ -799,12 +799,10 @@ void AddDot4x4_13(int k, const float *a, int lda, const float *b, int ldb, float
         b_reg.v = _mm_load_ps(b);
         b += 4;
 
-        a_0p_reg.v = _mm_set_ps1(a[0]);
-        a_1p_reg.v = _mm_set_ps1(a[1]);
-        a_2p_reg.v = _mm_set_ps1(a[2]);
-        a_3p_reg.v = _mm_set_ps1(a[3]);
-
-        a += 4;
+        a_0p_reg.v = _mm_set_ps1(*a++);
+        a_1p_reg.v = _mm_set_ps1(*a++);
+        a_2p_reg.v = _mm_set_ps1(*a++);
+        a_3p_reg.v = _mm_set_ps1(*a++);
 
         c_p0_sum.v += b_reg.v * a_0p_reg.v;
         c_p1_sum.v += b_reg.v * a_1p_reg.v;

@@ -6,6 +6,7 @@
 #define GEMM_OPT_UTILS_H
 
 #include <iostream>
+#include <omp.h>
 
 #include <mmintrin.h>  // MMX
 #include <xmmintrin.h>  // SSE

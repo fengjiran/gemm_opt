@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <omp.h>
+#include <random>
+#include <type_traits>
 
 #include <mmintrin.h>  // MMX
 #include <xmmintrin.h>  // SSE

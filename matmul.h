@@ -7,46 +7,67 @@
 
 #include "utils.h"
 
-static double get_time(struct timespec *start, struct timespec *end) {
+static double get_time(timespec* start, timespec* end) {
     return end->tv_sec - start->tv_sec + (end->tv_nsec - start->tv_nsec) * 1e-9;
 }
 
-void random_matrix(int m, int n, float *a, int lda);
+template<typename T = float,
+         typename = std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>>>
+std::vector<T> GetRandomMatrix(size_t m, size_t n, T low = 0, T high = 1) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::vector<T> matrix(m * n);
+    if constexpr (std::is_integral_v<T>) {
+        std::uniform_int_distribution<T> dist(low, high);
+        for (size_t i = 0; i < m * n; ++i) {
+            matrix[i] = dist(gen);
+        }
+    } else if constexpr (std::is_floating_point_v<T>) {
+        std::uniform_real_distribution<T> dist(low, high);
+        for (size_t i = 0; i < m * n; ++i) {
+            matrix[i] = dist(gen);
+        }
+    }
+    return matrix;
+}
 
-void copy_matrix(int m, int n, const float *a, int lda, float *b, int ldb);
 
-float compare_matrices(int m, int n, float *a, int lda, float *b, int ldb);
+void random_matrix(int m, int n, float* a, int lda);
 
-void matmul_origin(int m, int n, int k, const float *a, int lda, const float *b, int ldb, float *c, int ldc);
+void copy_matrix(int m, int n, const float* a, int lda, float* b, int ldb);
 
-void my_matmul_1x4_3(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+float compare_matrices(int m, int n, float* a, int lda, float* b, int ldb);
 
-void my_matmul_1x4_4(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void matmul_origin(int m, int n, int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc);
 
-void my_matmul_1x4_5(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_1x4_3(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_1x4_6(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_1x4_4(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_1x4_7(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_1x4_5(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_1x4_8(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_1x4_6(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_1x4_9(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_1x4_7(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_4x4_3(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_1x4_8(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_4x4_4(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_1x4_9(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_4x4_5(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_4x4_3(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_4x4_6(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_4x4_4(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_4x4_7(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_4x4_5(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_4x4_10(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_4x4_6(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_4x4_11(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_4x4_7(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-void my_matmul_4x4_13(int m, int n, int k, float *a, int lda, float *b, int ldb, float *c, int ldc);
+void my_matmul_4x4_10(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
 
-#endif //GEMM_OPT_MATMUL_H
+void my_matmul_4x4_11(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
+
+void my_matmul_4x4_13(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc);
+
+#endif//GEMM_OPT_MATMUL_H

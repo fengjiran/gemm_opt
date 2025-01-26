@@ -7,7 +7,7 @@ void random_matrix(int m, int n, float *a, int lda) {
     //double drand48();
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            A(i, j) = (float) drand48();
+            A(i, j) = static_cast<float>(drand48());
         }
     }
 }

@@ -4,26 +4,30 @@
 #include "matmul.h"
 
 int main() {
-    int m, n, k;
-    int lda, ldb, ldc;
-    double time_tmp, time_best, gflops, diff;
-    float *a, *b, *c, *prec, *nowc;
+    double time_best;
     struct timespec start, end;
-//    double time_used = 0.0;
+    auto x = GetRandomMatrix(5, 5);
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 5; ++j) {
+            std::cout << x[i * 5 + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
 
     for (int i = 40; i <= 1000; i += 40) {
-        m = i;
-        k = i;
-        n = i;
-        lda = k;
-        ldb = n;
-        ldc = n;
-        gflops = 2.0 * m * n * k * 1.0e-9;
-        a = new float[lda * m];
-        b = new float[ldb * k];
-        c = new float[ldc * m];
-        prec = new float[ldc * m];
-        nowc = new float[ldc * m];
+        int m = i;
+        int k = i;
+        int n = i;
+        int lda = k;
+        int ldb = n;
+        int ldc = n;
+        double gflops = 2.0 * m * n * k * 1.0e-9;
+        auto *a = new float[lda * m];
+        auto *b = new float[ldb * k];
+        auto *c = new float[ldc * m];
+        auto *prec = new float[ldc * m];
+        auto *nowc = new float[ldc * m];
 
         // 随机填充矩阵
         random_matrix(m, k, a, lda);
@@ -53,7 +57,7 @@ int main() {
 //            my_matmul_4x4_5(m, n, k, a, lda, b, ldb, c, ldc);
             my_matmul_4x4_13(m, n, k, a, lda, b, ldb, c, ldc);
             clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-            time_tmp = get_time(&start, &end);
+            double time_tmp = get_time(&start, &end);
 
             if (j == 0)
                 time_best = time_tmp;
@@ -61,7 +65,7 @@ int main() {
                 time_best = min(time_best, time_tmp);
         }
 
-        diff = compare_matrices(m, n, c, ldc, nowc, ldc);
+        double diff = compare_matrices(m, n, c, ldc, nowc, ldc);
         if (diff > 0.5f || diff < -0.5f) {
             exit(0);
         }

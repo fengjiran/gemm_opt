@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 project(gemm_opt)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 FIND_PACKAGE(OpenMP REQUIRED)
 if(OPENMP_FOUND)

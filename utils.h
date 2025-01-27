@@ -34,4 +34,20 @@ typedef union {
     float d[4];
 } v2df_t;
 
+class Timer {
+public:
+    Timer() : start(std::chrono::high_resolution_clock::now()) {}
+
+    // Get elapsed time in seconds
+    [[nodiscard]] double GetElapsedTime() const {
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        return static_cast<double>(duration.count()) *
+               std::chrono::microseconds::period::num / std::chrono::microseconds::period::den;
+    }
+
+private:
+    std::chrono::high_resolution_clock::time_point start;
+};
+
 #endif //GEMM_OPT_UTILS_H

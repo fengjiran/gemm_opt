@@ -6,13 +6,15 @@
 int main() {
     double time_best;
     struct timespec start, end;
-    auto x = GetRandomMatrix(5, 5);
+    auto x = GenRandomMatrix<float>(5, 5);
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
             std::cout << x[i * 5 + j] << " ";
         }
         std::cout << std::endl;
     }
+
+    return 0;
 
 
     for (int i = 40; i <= 1000; i += 40) {

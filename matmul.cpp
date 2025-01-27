@@ -5,10 +5,20 @@
 
 void random_matrix(int m, int n, float* a, int lda) {
     //double drand48();
-    for (int i = 0; i < m; i++) { for (int j = 0; j < n; j++) { A(i, j) = static_cast<float>(drand48()); } }
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            A(i, j) = static_cast<float>(drand48());
+        }
+    }
 }
 
-void copy_matrix(int m, int n, const float* a, int lda, float* b, int ldb) { for (int i = 0; i < m; i++) { for (int j = 0; j < n; j++) { B(i, j) = A(i, j); } } }
+void copy_matrix(int m, int n, const float* a, int lda, float* b, int ldb) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            B(i, j) = A(i, j);
+        }
+    }
+}
 
 float compare_matrices(int m, int n, float* a, int lda, float* b, int ldb) {
     float max_diff = 0.0, diff;
@@ -16,18 +26,32 @@ float compare_matrices(int m, int n, float* a, int lda, float* b, int ldb) {
         for (int j = 0; j < n; j++) {
             diff = std::abs(A(i, j) - B(i, j));
             max_diff = max(diff, max_diff);
-            if (max_diff > 0.5f || max_diff < -0.5f) { printf("\n error: i %d  j %d diff %f", i, j, max_diff); }
+            if (max_diff > 0.5f || max_diff < -0.5f) {
+                printf("\n error: i %d  j %d diff %f", i, j, max_diff);
+            }
         }
     }
     return max_diff;
 }
 
 // gemm C = A * B + C
-void matmul_origin(int m, int n, int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) { for (int i = 0; i < m; i++) { for (int j = 0; j < n; j++) { for (int p = 0; p < k; p++) { C(i, j) = C(i, j) + A(i, p) * B(p, j); } } } }
+void matmul_origin(int m, int n, int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int p = 0; p < k; p++) {
+                C(i, j) = C(i, j) + A(i, p) * B(p, j);
+            }
+        }
+    }
+}
 
 // compute gamma := x' * y + gamma with vectors x and y of length n.
 // Here x starts at location x with increment (stride) incx and y starts at location y and has (implicit) stride of 1.
-void AddDot(int k, const float* x, int incx, const float* y, float* gamma) { for (int p = 0; p < k; p++) { *gamma += x[p] * Y(p); } }
+void AddDot(int k, const float* x, int incx, const float* y, float* gamma) {
+    for (int p = 0; p < k; p++) {
+        *gamma += x[p] * Y(p);
+    }
+}
 
 void AddDot1x4_3(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     AddDot(k, &A(0, 0), lda, &B(0, 0), &C(0, 0));
@@ -36,24 +60,44 @@ void AddDot1x4_3(int k, const float* a, int lda, const float* b, int ldb, float*
     AddDot(k, &A(0, 0), lda, &B(0, 3), &C(0, 3));
 }
 
-void my_matmul_1x4_3(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i++) { AddDot1x4_3(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_1x4_3(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i++) {
+            AddDot1x4_3(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc);
+        }
+    }
+}
 
 // In this version, we "inline" AddDot
 void AddDot1x4_4(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     // AddDot(k, &A(0, 0), lda, &B(0, 0), &C(0, 0));
-    for (int p = 0; p < k; p++) { C(0, 0) += A(0, p) * B(p, 0); }
+    for (int p = 0; p < k; p++) {
+        C(0, 0) += A(0, p) * B(p, 0);
+    }
 
     // AddDot(k, &A(0, 0), lda, &B(0, 1), &C(0, 1));
-    for (int p = 0; p < k; p++) { C(0, 1) += A(0, p) * B(p, 1); }
+    for (int p = 0; p < k; p++) {
+        C(0, 1) += A(0, p) * B(p, 1);
+    }
 
     // AddDot(k, &A(0, 0), lda, &B(0, 2), &C(0, 2));
-    for (int p = 0; p < k; p++) { C(0, 2) += A(0, p) * B(p, 2); }
+    for (int p = 0; p < k; p++) {
+        C(0, 2) += A(0, p) * B(p, 2);
+    }
 
     // AddDot(k, &A(0, 0), lda, &B(0, 3), &C(0, 3));
-    for (int p = 0; p < k; p++) { C(0, 3) += A(0, p) * B(p, 3); }
+    for (int p = 0; p < k; p++) {
+        C(0, 3) += A(0, p) * B(p, 3);
+    }
 }
 
-void my_matmul_1x4_4(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i++) { AddDot1x4_4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_1x4_4(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i++) {
+            AddDot1x4_4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc);
+        }
+    }
+}
 
 // In this version, we merge the four loops, computing four inner
 // products simultaneously.
@@ -70,12 +114,16 @@ void AddDot1x4_5(int k, const float* a, int lda, const float* b, int ldb, float*
     }
 }
 
-void my_matmul_1x4_5(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i++) { AddDot1x4_5(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_1x4_5(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i++) { AddDot1x4_5(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 // In this version, we accumulate in registers and put A( 0, p ) in a register
 void AddDot1x4_6(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     float c_00_reg, c_01_reg, c_02_reg, c_03_reg;// hold C( 0, 0 ), C( 0, 1 ), C( 0, 2 ), C( 0, 3 )
-    float a_0p_reg;// holds A( 0, p )
+    float a_0p_reg;                              // holds A( 0, p )
 
     c_00_reg = 0;
     c_01_reg = 0;
@@ -95,12 +143,16 @@ void AddDot1x4_6(int k, const float* a, int lda, const float* b, int ldb, float*
     C(0, 3) += c_03_reg;
 }
 
-void my_matmul_1x4_6(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i++) { AddDot1x4_6(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_1x4_6(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i++) { AddDot1x4_6(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 // In this version, we use pointer to track where in four rows of A we are
 void AddDot1x4_7(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     float c_00_reg, c_01_reg, c_02_reg, c_03_reg;// hold C( 0, 0 ), C( 0, 1 ), C( 0, 2 ), C( 0, 3 )
-    float b_p0_reg;// holds B(p, 0)
+    float b_p0_reg;                              // holds B(p, 0)
 
     c_00_reg = 0;
     c_01_reg = 0;
@@ -126,12 +178,16 @@ void AddDot1x4_7(int k, const float* a, int lda, const float* b, int ldb, float*
     C(3, 0) += c_03_reg;
 }
 
-void my_matmul_1x4_7(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j++) { for (int i = 0; i < m; i += 4) { AddDot1x4_7(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_1x4_7(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i += 4) { AddDot1x4_7(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 // loop unrolling
 void AddDot1x4_8(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     float c_00_reg, c_01_reg, c_02_reg, c_03_reg;// hold C( 0, 0 ), C( 0, 1 ), C( 0, 2 ), C( 0, 3 )
-    float b_p0_reg;// holds B(p, 0)
+    float b_p0_reg;                              // holds B(p, 0)
 
     c_00_reg = 0;
     c_01_reg = 0;
@@ -175,12 +231,16 @@ void AddDot1x4_8(int k, const float* a, int lda, const float* b, int ldb, float*
     C(3, 0) += c_03_reg;
 }
 
-void my_matmul_1x4_8(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j++) { for (int i = 0; i < m; i += 4) { AddDot1x4_8(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_1x4_8(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i += 4) { AddDot1x4_8(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 // loop unrolling
 void AddDot1x4_9(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     float c_00_reg, c_01_reg, c_02_reg, c_03_reg;// hold C( 0, 0 ), C( 0, 1 ), C( 0, 2 ), C( 0, 3 )
-    float b_p0_reg;// holds B(p, 0)
+    float b_p0_reg;                              // holds B(p, 0)
 
     c_00_reg = 0;
     c_01_reg = 0;
@@ -229,7 +289,11 @@ void AddDot1x4_9(int k, const float* a, int lda, const float* b, int ldb, float*
     C(3, 0) += c_03_reg;
 }
 
-void my_matmul_1x4_9(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j++) { for (int i = 0; i < m; i += 4) { AddDot1x4_9(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_1x4_9(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i += 4) { AddDot1x4_9(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 void AddDot4x4_3(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     // first row
@@ -257,7 +321,11 @@ void AddDot4x4_3(int k, const float* a, int lda, const float* b, int ldb, float*
     AddDot(k, &A(3, 0), lda, &B(0, 3), &C(3, 3));
 }
 
-void my_matmul_4x4_3(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i += 4) { AddDot4x4_3(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_4x4_3(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i += 4) { AddDot4x4_3(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 void AddDot4x4_4(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     // first row
@@ -297,7 +365,11 @@ void AddDot4x4_4(int k, const float* a, int lda, const float* b, int ldb, float*
     for (int p = 0; p < k; p++) { C(3, 3) += A(3, p) * B(p, 3); }
 }
 
-void my_matmul_4x4_4(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i += 4) { AddDot4x4_4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_4x4_4(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i += 4) { AddDot4x4_4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 void AddDot4x4_5(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     for (int p = 0; p < k; p++) {
@@ -327,14 +399,18 @@ void AddDot4x4_5(int k, const float* a, int lda, const float* b, int ldb, float*
     }
 }
 
-void my_matmul_4x4_5(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i += 4) { AddDot4x4_5(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_4x4_5(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i += 4) { AddDot4x4_5(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 void AddDot4x4_6(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     float c_00_reg, c_01_reg, c_02_reg, c_03_reg,
-          c_10_reg, c_11_reg, c_12_reg, c_13_reg,
-          c_20_reg, c_21_reg, c_22_reg, c_23_reg,
-          c_30_reg, c_31_reg, c_32_reg, c_33_reg,
-          a_0p_reg, a_1p_reg, a_2p_reg, a_3p_reg;
+            c_10_reg, c_11_reg, c_12_reg, c_13_reg,
+            c_20_reg, c_21_reg, c_22_reg, c_23_reg,
+            c_30_reg, c_31_reg, c_32_reg, c_33_reg,
+            a_0p_reg, a_1p_reg, a_2p_reg, a_3p_reg;
 
     c_00_reg = 0;
     c_01_reg = 0;
@@ -402,14 +478,18 @@ void AddDot4x4_6(int k, const float* a, int lda, const float* b, int ldb, float*
     C(3, 3) += c_33_reg;
 }
 
-void my_matmul_4x4_6(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i += 4) { AddDot4x4_6(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_4x4_6(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i += 4) { AddDot4x4_6(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 void AddDot4x4_7(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     float c_00_reg, c_01_reg, c_02_reg, c_03_reg,
-          c_10_reg, c_11_reg, c_12_reg, c_13_reg,
-          c_20_reg, c_21_reg, c_22_reg, c_23_reg,
-          c_30_reg, c_31_reg, c_32_reg, c_33_reg,
-          a_0p_reg, a_1p_reg, a_2p_reg, a_3p_reg;
+            c_10_reg, c_11_reg, c_12_reg, c_13_reg,
+            c_20_reg, c_21_reg, c_22_reg, c_23_reg,
+            c_30_reg, c_31_reg, c_32_reg, c_33_reg,
+            a_0p_reg, a_1p_reg, a_2p_reg, a_3p_reg;
 
     c_00_reg = 0;
     c_01_reg = 0;
@@ -484,7 +564,11 @@ void AddDot4x4_7(int k, const float* a, int lda, const float* b, int ldb, float*
     C(3, 3) += c_33_reg;
 }
 
-void my_matmul_4x4_7(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i += 4) { AddDot4x4_7(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_4x4_7(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i += 4) { AddDot4x4_7(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 void AddDot4x4_10(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     const float* a_0p_ptr = &A(0, 0);
@@ -540,7 +624,11 @@ void AddDot4x4_10(int k, const float* a, int lda, const float* b, int ldb, float
     C(3, 3) += c_p3_sum.d[3];
 }
 
-void my_matmul_4x4_10(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i += 4) { AddDot4x4_10(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void my_matmul_4x4_10(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i += 4) { AddDot4x4_10(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 void AddDot4x4_11(int k, const float* a, int lda, const float* b, int ldb, float* c, int ldc) {
     const float* a_0p_ptr = &A(0, 0);
@@ -596,7 +684,11 @@ void AddDot4x4_11(int k, const float* a, int lda, const float* b, int ldb, float
     C(3, 3) += c_p3_sum.d[3];
 }
 
-void InnerKernel(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) { for (int j = 0; j < n; j += 4) { for (int i = 0; i < m; i += 4) { AddDot4x4_11(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); } } }
+void InnerKernel(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
+    for (int j = 0; j < n; j += 4) {
+        for (int i = 0; i < m; i += 4) { AddDot4x4_11(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc); }
+    }
+}
 
 void my_matmul_4x4_11(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
     int pb, ib;

@@ -12,25 +12,31 @@ static double get_time(timespec* start, timespec* end) {
 }
 
 template<typename T = float,
-         typename = std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>>>
-std::vector<T> GetRandomMatrix(size_t m, size_t n, T low = 0, T high = 1) {
+         typename = std::enable_if_t<std::is_floating_point_v<T>>>
+std::vector<T> GenRandomMatrix(size_t m, size_t n, T low = 0, T high = 1) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::vector<T> matrix(m * n);
-    if constexpr (std::is_integral_v<T>) {
-        std::uniform_int_distribution<T> dist(low, high);
-        for (size_t i = 0; i < m * n; ++i) {
-            matrix[i] = dist(gen);
-        }
-    } else if constexpr (std::is_floating_point_v<T>) {
-        std::uniform_real_distribution<T> dist(low, high);
-        for (size_t i = 0; i < m * n; ++i) {
-            matrix[i] = dist(gen);
-        }
+    std::uniform_real_distribution<T> dist(low, high);
+    for (size_t i = 0; i < m * n; ++i) {
+        matrix[i] = dist(gen);
     }
     return matrix;
 }
 
+template<typename T,
+         typename = void,
+         typename = std::enable_if_t<std::is_integral_v<T>>>
+std::vector<T> GenRandomMatrix(size_t m, size_t n, T low = 0, T high = 10) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::vector<T> matrix(m * n);
+    std::uniform_int_distribution<T> dist(low, high);
+    for (size_t i = 0; i < m * n; ++i) {
+        matrix[i] = dist(gen);
+    }
+    return matrix;
+}
 
 void random_matrix(int m, int n, float* a, int lda);
 

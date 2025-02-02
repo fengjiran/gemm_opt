@@ -1,17 +1,46 @@
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 //#include "dclock.h"
 #include "matmul.h"
 
 int main() {
     double time_best;
     struct timespec start, end;
-    auto x = GenRandomMatrix<float>(5, 5);
-    for (int i = 0; i < 5; ++i) {
-        for (int j = 0; j < 5; ++j) {
-            std::cout << x[i * 5 + j] << " ";
+
+    for (int i = 480; i <= 480; i += 40) {
+        int m = i;
+        int k = i;
+        int n = i;
+        int lda = k;
+        int ldb = n;
+        int ldc = n;
+        double gflops = 2.0 * m * n * k * 1.0e-9;
+
+        auto a = GenRandomMatrix(m, lda);
+        auto b = GenRandomMatrix(k, ldb);
+        auto c = GenRandomMatrix(m, ldc);
+        auto std_c = c;
+
+        matmul_origin(a, b, std_c, m, n, k, lda, ldb, ldc);
+
+        double run_time = 0;
+        for (int j = 0; j < 20; ++j) {
+            Timer t;
+            matmul_origin(a, b, c, m, n, k, lda, ldb, ldc);
+            double tmp = t.GetElapsedTime();
+
+            if (j == 0) {
+                run_time = tmp;
+            } else {
+                run_time = std::min(run_time, tmp);
+            }
         }
-        std::cout << std::endl;
+
+        if (std::abs(compare_matrix(std_c, c, m, n, ldc, ldc)) > 0.5f) {
+            exit(0);
+        }
+
+        std::cout << "i = " << i << ", gflops = " << gflops / run_time << std::endl;
     }
 
     return 0;
@@ -25,11 +54,11 @@ int main() {
         int ldb = n;
         int ldc = n;
         double gflops = 2.0 * m * n * k * 1.0e-9;
-        auto *a = new float[lda * m];
-        auto *b = new float[ldb * k];
-        auto *c = new float[ldc * m];
-        auto *prec = new float[ldc * m];
-        auto *nowc = new float[ldc * m];
+        auto* a = new float[lda * m];
+        auto* b = new float[ldb * k];
+        auto* c = new float[ldc * m];
+        auto* prec = new float[ldc * m];
+        auto* nowc = new float[ldc * m];
 
         // 随机填充矩阵
         random_matrix(m, k, a, lda);
@@ -47,16 +76,16 @@ int main() {
         for (int j = 0; j < 20; j++) {
             copy_matrix(m, n, prec, ldc, c, ldc);
             clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-//            my_matmul_1x4_3(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_1x4_4(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_1x4_5(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_1x4_6(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_1x4_7(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_1x4_8(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_1x4_9(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_4x4_3(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_4x4_4(m, n, k, a, lda, b, ldb, c, ldc);
-//            my_matmul_4x4_5(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_1x4_3(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_1x4_4(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_1x4_5(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_1x4_6(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_1x4_7(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_1x4_8(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_1x4_9(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_4x4_3(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_4x4_4(m, n, k, a, lda, b, ldb, c, ldc);
+            //            my_matmul_4x4_5(m, n, k, a, lda, b, ldb, c, ldc);
             my_matmul_4x4_13(m, n, k, a, lda, b, ldb, c, ldc);
             clock_gettime(CLOCK_MONOTONIC_RAW, &end);
             double time_tmp = get_time(&start, &end);
@@ -64,7 +93,7 @@ int main() {
             if (j == 0)
                 time_best = time_tmp;
             else
-                time_best = min(time_best, time_tmp);
+                time_best = std::min(time_best, time_tmp);
         }
 
         double diff = compare_matrices(m, n, c, ldc, nowc, ldc);

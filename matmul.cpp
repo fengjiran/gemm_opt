@@ -693,9 +693,9 @@ void InnerKernel(int m, int n, int k, float* a, int lda, float* b, int ldb, floa
 void my_matmul_4x4_11(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
     int pb, ib;
     for (int p = 0; p < k; p += KC) {
-        pb = min(k - p, KC);
+        pb = std::min(k - p, KC);
         for (int i = 0; i < m; i += MC) {
-            ib = min(m - i, MC);
+            ib = std::min(m - i, MC);
             InnerKernel(ib, n, pb, &A(i, p), lda, &B(p, 0), ldb, &C(i, 0), ldc);
         }
     }
@@ -790,10 +790,10 @@ void InnerKernel_13(int m, int n, int k, float* a, int lda, float* b, int ldb, f
 void my_matmul_4x4_13(int m, int n, int k, float* a, int lda, float* b, int ldb, float* c, int ldc) {
     int pb, ib;
     for (int p = 0; p < k; p += KC) {
-        pb = min(k - p, KC);
+        pb = std::min(k - p, KC);
         //#pragma omp parallel for
         for (int i = 0; i < m; i += MC) {
-            ib = min(m - i, MC);
+            ib = std::min(m - i, MC);
             InnerKernel_13(ib, n, pb, &A(i, p), lda, &B(p, 0), ldb, &C(i, 0), ldc);
         }
     }

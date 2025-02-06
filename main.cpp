@@ -4,9 +4,7 @@
 #include "matmul.h"
 
 int main() {
-    double time_best;
-    struct timespec start, end;
-
+    std::cout << "cache line(bytes): " << get_cache_line() << std::endl;
     for (int i = 480; i <= 480; i += 40) {
         int m = i;
         int k = i;
@@ -18,7 +16,7 @@ int main() {
 
         auto a = GenRandomMatrix(m, lda);
         auto b = GenRandomMatrix(k, ldb);
-        auto c = GenRandomMatrix(m, ldc);
+        auto c = std::vector<float>(m * ldc);
         auto std_c = c;
 
         matmul_origin(a, b, std_c, m, n, k, lda, ldb, ldc);
@@ -26,7 +24,8 @@ int main() {
         double run_time = 0;
         for (int j = 0; j < 20; ++j) {
             Timer t;
-            matmul_origin(a, b, c, m, n, k, lda, ldb, ldc);
+            // matmul_origin(a, b, c, m, n, k, lda, ldb, ldc);
+            matmul_reorder(a, b, c, m, n, k, lda, ldb, ldc);
             double tmp = t.GetElapsedTime();
 
             if (j == 0) {
@@ -45,7 +44,7 @@ int main() {
 
     return 0;
 
-
+    /***
     for (int i = 40; i <= 1000; i += 40) {
         int m = i;
         int k = i;
@@ -113,4 +112,5 @@ int main() {
     fflush(stdout);
 
     return 0;
+    ***/
 }

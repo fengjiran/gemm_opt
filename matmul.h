@@ -11,6 +11,8 @@ static double get_time(timespec* start, timespec* end) {
     return end->tv_sec - start->tv_sec + (end->tv_nsec - start->tv_nsec) * 1e-9;
 }
 
+
+
 template<typename T = float,
          typename = std::enable_if_t<std::is_floating_point_v<T>>>
 std::vector<T> GenRandomMatrix(size_t m, size_t n, T low = 0, T high = 1) {
@@ -39,6 +41,23 @@ std::vector<T> GenRandomMatrix(size_t m, size_t n, T low = 0, T high = 10) {
 }
 
 template<typename T>
+float compare_matrix(const std::vector<T>& a, const std::vector<T>& b,
+                     size_t m, size_t n, size_t lda, size_t ldb) {
+    float max_diff = 0;
+    for (size_t i = 0; i < m; ++i) {
+        for (size_t j = 0; j < n; ++j) {
+            float diff = std::abs(a[i * lda + j] - b[i * ldb + j]);
+            max_diff += diff;
+            if (diff > std::numeric_limits<float>::epsilon()) {
+                std::cerr << "error at: (" << i << ", " << j << "): diff = " << diff << std::endl;
+            }
+        }
+    }
+    return max_diff;
+}
+
+// gemm C = A * B + C
+template<typename T>
 void matmul_origin(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& c,
                    size_t m, size_t n, size_t k,
                    size_t lda, size_t ldb, size_t ldc) {
@@ -54,19 +73,17 @@ void matmul_origin(const std::vector<T>& a, const std::vector<T>& b, std::vector
 }
 
 template<typename T>
-float compare_matrix(const std::vector<T>& a, const std::vector<T>& b,
-                     size_t m, size_t n, size_t lda, size_t ldb) {
-    float max_diff = 0;
-    for (size_t i = 0; i < m; ++i) {
-        for (size_t j = 0; j < n; ++j) {
-            float diff = std::abs(a[i * lda + j] - b[i * ldb + j]);
-            max_diff += diff;
-            if (diff > std::numeric_limits<float>::epsilon()) {
-                std::cerr << "error at: (" << i << ", " << j << "): diff = " << diff << std::endl;
+void matmul_reorder(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& c,
+                   size_t m, size_t n, size_t k,
+                   size_t lda, size_t ldb, size_t ldc) {
+    for (size_t p = 0; p < k; ++p) {
+        for (size_t i = 0; i < m; ++i) {
+            T t = a[i * lda + p];
+            for (size_t j = 0; j < n; ++j) {
+                c[i * ldc + j] += t * b[p * ldb + j];
             }
         }
     }
-    return max_diff;
 }
 
 void random_matrix(int m, int n, float* a, int lda);

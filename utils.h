@@ -57,6 +57,19 @@ typedef union {
     float d[4];
 } v2df_t;
 
+// get cache line in byte
+size_t get_cache_line();
+
+#if defined(__APPLE__)
+#include <sys/sysctl.h>
+inline size_t get_cache_line() {
+    size_t cache_line = 0;
+    size_t sizeof_cache_line = sizeof(cache_line);
+    sysctlbyname("hw.cachelinesize", &cache_line, &sizeof_cache_line, nullptr, 0);
+    return cache_line;
+}
+#endif
+
 class Timer {
 public:
     Timer() : start(std::chrono::high_resolution_clock::now()) {}

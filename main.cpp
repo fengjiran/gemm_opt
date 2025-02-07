@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include <cstring>
-//#include "dclock.h"
 #include "matmul.h"
 
 int main() {
@@ -23,9 +22,11 @@ int main() {
 
         double run_time = 0;
         for (int j = 0; j < 20; ++j) {
+            std::fill(c.begin(), c.end(), 0);
             Timer t;
-            // matmul_origin(a, b, c, m, n, k, lda, ldb, ldc);
-            matmul_reorder(a, b, c, m, n, k, lda, ldb, ldc);
+            matmul_origin(a, b, c, m, n, k, lda, ldb, ldc);
+            // matmul_reorder_kij(a, b, c, m, n, k, lda, ldb, ldc);
+            // matmul_reorder_ikj(a, b, c, m, n, k, lda, ldb, ldc);
             double tmp = t.GetElapsedTime();
 
             if (j == 0) {

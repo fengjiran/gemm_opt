@@ -12,7 +12,6 @@ static double get_time(timespec* start, timespec* end) {
 }
 
 
-
 template<typename T = float,
          typename = std::enable_if_t<std::is_floating_point_v<T>>>
 std::vector<T> GenRandomMatrix(size_t m, size_t n, T low = 0, T high = 1) {
@@ -73,11 +72,25 @@ void matmul_origin(const std::vector<T>& a, const std::vector<T>& b, std::vector
 }
 
 template<typename T>
-void matmul_reorder(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& c,
-                   size_t m, size_t n, size_t k,
-                   size_t lda, size_t ldb, size_t ldc) {
+void matmul_reorder_kij(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& c,
+                        size_t m, size_t n, size_t k,
+                        size_t lda, size_t ldb, size_t ldc) {
     for (size_t p = 0; p < k; ++p) {
         for (size_t i = 0; i < m; ++i) {
+            T t = a[i * lda + p];
+            for (size_t j = 0; j < n; ++j) {
+                c[i * ldc + j] += t * b[p * ldb + j];
+            }
+        }
+    }
+}
+
+template<typename T>
+void matmul_reorder_ikj(const std::vector<T>& a, const std::vector<T>& b, std::vector<T>& c,
+                        size_t m, size_t n, size_t k,
+                        size_t lda, size_t ldb, size_t ldc) {
+    for (size_t i = 0; i < m; ++i) {
+        for (size_t p = 0; p < k; ++p) {
             T t = a[i * lda + p];
             for (size_t j = 0; j < n; ++j) {
                 c[i * ldc + j] += t * b[p * ldb + j];

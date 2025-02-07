@@ -3,7 +3,7 @@
 #include "matmul.h"
 
 int main() {
-    std::cout << "cache line(bytes): " << get_cache_line() << std::endl;
+    // std::cout << "cache line(bytes): " << get_cache_line() << std::endl;
     for (int i = 480; i <= 480; i += 40) {
         int m = i;
         int k = i;
@@ -24,9 +24,9 @@ int main() {
         for (int j = 0; j < 20; ++j) {
             std::fill(c.begin(), c.end(), 0);
             Timer t;
-            matmul_origin(a, b, c, m, n, k, lda, ldb, ldc);
+            // matmul_origin(a, b, c, m, n, k, lda, ldb, ldc);
             // matmul_reorder_kij(a, b, c, m, n, k, lda, ldb, ldc);
-            // matmul_reorder_ikj(a, b, c, m, n, k, lda, ldb, ldc);
+            matmul_reorder_ikj(a, b, c, m, n, k, lda, ldb, ldc);
             double tmp = t.GetElapsedTime();
 
             if (j == 0) {
